@@ -102,7 +102,7 @@ app.directive('autocomplete', function() {
         }
 
         if('LI' == element.tagName) {
-          var index = element.getAttribute('index');
+          index = element.getAttribute('index');
           $scope.select($scope.suggestions[index]);
         }
       };
@@ -155,20 +155,20 @@ app.directive('autocomplete', function() {
           case key.esc:
             // disable suggestions on escape
             scope.select();
-            scope.setIndex(-1);
             scope.$apply();
             e.preventDefault();
         }
       }, true);
 
-      document.addEventListener("blur", function(e){
+      element[0].addEventListener("blur", function(e){
         // disable suggestions on blur
         // we do a timeout to prevent hiding it before a click event is registered
         setTimeout(function() {
-          scope.select();
-          scope.setIndex(-1);
-          scope.$apply();
-        }, 150);
+          if(scope.completing) {
+              scope.select();
+              scope.$apply();
+          }
+        }, 300);
       }, true);
 
       element[0].addEventListener("keydown",function (e){
@@ -195,7 +195,7 @@ app.directive('autocomplete', function() {
             scope.setIndex(index);
 
             if(index!==-1)
-              scope.preSelect(angular.element(angular.element(this).find('li')[index]).text());
+              scope.preSelect(scope.suggestions[index]);
 
             scope.$apply();
 
@@ -214,7 +214,7 @@ app.directive('autocomplete', function() {
             scope.setIndex(index);
 
             if(index!==-1)
-              scope.preSelect(angular.element(angular.element(this).find('li')[index]).text());
+              scope.preSelect(scope.suggestions[index]);
 
             break;
           case key.left:
@@ -226,7 +226,7 @@ app.directive('autocomplete', function() {
             index = scope.getIndex();
             // scope.preSelectOff();
             if(index !== -1) {
-              scope.select(angular.element(angular.element(this).find('li')[index]).text());
+              scope.select(scope.suggestions[index]);
               if(keycode == key.enter) {
                 e.preventDefault();
               }
@@ -235,14 +235,12 @@ app.directive('autocomplete', function() {
                 scope.select();
               }
             }
-            scope.setIndex(-1);
             scope.$apply();
 
             break;
           case key.esc:
             // disable suggestions on escape
             scope.select();
-            scope.setIndex(-1);
             scope.$apply();
             e.preventDefault();
             break;
@@ -253,7 +251,7 @@ app.directive('autocomplete', function() {
       });
     },
     template: '\
-        <div class="autocomplete {{ attrs.class }}" id="{{ attrs.id }}" ng-click="handleSelect($event)">\
+        <div class="autocomplete {{ attrs.class }}" id="{{ attrs.id }}">\
           <input\
             type="text"\
             ng-model="searchParam"\
@@ -263,7 +261,7 @@ app.directive('autocomplete', function() {
             id="{{ attrs.inputid }}"\
             name="{{ attrs.name }}"\
             ng-required="{{ autocompleteRequired }}" />\
-          <ul ng-if="!noAutoSort" ng-show="completing && (suggestions | filter:searchFilter).length > 0">\
+          <ul ng-if="!noAutoSort" ng-show="completing && (suggestions | filter:searchFilter).length > 0" ng-click="handleSelect($event)">\
             <li\
               suggestion\
               ng-repeat="suggestion in suggestions | filter:searchFilter | orderBy:\'toString()\' track by $index"\
@@ -272,7 +270,7 @@ app.directive('autocomplete', function() {
               ng-class="{ active: ($index === selectedIndex) }"\
               ng-bind-html="suggestion | highlight:searchParam"></li>\
           </ul>\
-          <ul ng-if="noAutoSort" ng-show="completing && (suggestions | filter:searchFilter).length > 0">\
+          <ul ng-if="noAutoSort" ng-show="completing && (suggestions | filter:searchFilter).length > 0" ng-click="handleSelect($event)">\
             <li\
               suggestion\
               ng-repeat="suggestion in suggestions | filter:searchFilter track by $index"\
