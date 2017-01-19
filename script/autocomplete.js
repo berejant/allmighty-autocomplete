@@ -95,6 +95,18 @@ app.directive('autocomplete', function() {
         $scope.setIndex(-1);
       };
 
+      $scope.handleSelect = function($event){
+        var element = $event.target;
+        if('SPAN' == element.tagName) {
+          element = element.parentElement;
+        }
+
+        if('LI' == element.tagName) {
+          var index = element.getAttribute('index');
+          $scope.select($scope.suggestions[index]);
+        }
+      };
+
 
     }],
     link: function(scope, element, attrs){
@@ -241,7 +253,7 @@ app.directive('autocomplete', function() {
       });
     },
     template: '\
-        <div class="autocomplete {{ attrs.class }}" id="{{ attrs.id }}">\
+        <div class="autocomplete {{ attrs.class }}" id="{{ attrs.id }}" ng-click="handleSelect($event)">\
           <input\
             type="text"\
             ng-model="searchParam"\
@@ -258,7 +270,6 @@ app.directive('autocomplete', function() {
               index="{{ $index }}"\
               val="{{ suggestion }}"\
               ng-class="{ active: ($index === selectedIndex) }"\
-              ng-click="select(suggestion)"\
               ng-bind-html="suggestion | highlight:searchParam"></li>\
           </ul>\
           <ul ng-if="noAutoSort" ng-show="completing && (suggestions | filter:searchFilter).length > 0">\
@@ -268,7 +279,6 @@ app.directive('autocomplete', function() {
               index="{{ $index }}"\
               val="{{ suggestion }}"\
               ng-class="{ active: ($index === selectedIndex) }"\
-              ng-click="select(suggestion)"\
               ng-bind-html="suggestion | highlight:searchParam"></li>\
           </ul>\
         </div>'
