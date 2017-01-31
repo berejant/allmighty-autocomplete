@@ -225,7 +225,7 @@ app.directive('autocomplete', function() {
             index = scope.getIndex();
             // scope.preSelectOff();
             if(index !== -1) {
-              scope.select(scope.suggestions[index]);
+              scope.select(angular.element(this).find('li').eq(index).attr('val'));
               if(keycode == key.enter) {
                 e.preventDefault();
               }
