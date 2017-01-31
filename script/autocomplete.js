@@ -102,8 +102,7 @@ app.directive('autocomplete', function() {
         }
 
         if('LI' == element.tagName) {
-          index = element.getAttribute('index');
-          $scope.select($scope.suggestions[index]);
+          $scope.select(element.getAttribute('val'));
         }
       };
 
@@ -195,7 +194,7 @@ app.directive('autocomplete', function() {
             scope.setIndex(index);
 
             if(index!==-1)
-              scope.preSelect(scope.suggestions[index]);
+              scope.preSelect(angular.element(this).find('li').eq(index).attr('val'));
 
             scope.$apply();
 
@@ -214,7 +213,7 @@ app.directive('autocomplete', function() {
             scope.setIndex(index);
 
             if(index!==-1)
-              scope.preSelect(scope.suggestions[index]);
+                scope.preSelect(angular.element(this).find('li').eq(index).attr('val'));
 
             break;
           case key.left:
